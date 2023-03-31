@@ -1,0 +1,120 @@
+Transform: AWS::Serverless-2016-10-31
+
+Description: A Lambda function to connect the Glue Data Catalog to Hive Metastores and allow federation of resources
+
+Metadata:
+  AWS::ServerlessRepo::Application:
+    Name: GlueDataCatalogFederation-HiveMetastore
+    Description: A Lambda function to connect the Glue Data Catalog to Hive Metastores and allow federation of resources
+    Author: AWS Glue Data Catalog Federation
+    SpdxLicenseId: Apache-2.0
+    LicenseUrl: LICENSE.txt
+    ReadmeUrl: README.md
+    SemanticVersion: 1.0.0
+    HomePageUrl: https://aws.amazon.com/glue/
+    SourceCodeUrl: https://github.com/awslabs/aws-glue-data-catalog-federation
+
+Parameters:
+  GlueConnectionName:
+    Description: Name of the Glue connection that will be used to create federated resources in the Glue Data Catalog.
+    Type: String
+    MaxLength: 255
+    Default: hive-metastore-connection
+  LambdaTimeout:
+    Description: Maximum Lambda invocation runtime in seconds. [1 - 900]
+    Type: Number
+    MinValue: 1
+    MaxValue: 900
+    Default: 30
+  LambdaMemory:
+    Description: Lambda memory in MB. [128 - 10240]
+    Type: Number
+    MinValue: 128
+    MaxValue: 10240
+    Default: 1024
+  HiveMetastoreURIs:
+    Description: Hive Metastore Thrift URIs.
+    Type: String
+  VPCSubnetIds:
+    Description: Comma separated VPC subnet IDs where Hive Metastores are in.
+    Type: List<AWS::EC2::Subnet::Id>
+  VPCSecurityGroupIds:
+    Description: Comma separated VPC security groups IDs where Hive Metastores are in.
+    Type: List<AWS::EC2::SecurityGroup::Id>
+  ConvertS3N:
+    Description: Convert s3n:// locations to s3:// before passing them to Glue. [true / false]
+    Type: String
+    AllowedValues:
+      - true
+      - false
+    Default: false
+
+Resources:
+  LambdaFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      Description: Allows Glue to make calls to the Hive Metastore.
+      CodeUri: lambda-function
+      Handler: com.amazonaws.glue.federation.connector.DefaultHiveMetastoreLambdaFunction::handleRequest
+      Runtime: java11
+      Timeout: !Ref LambdaTimeout
+      MemorySize: !Ref LambdaMemory
+      Environment:
+        Variables:
+          THRIFT_URIS: !Ref HiveMetastoreURIs
+          CONVERT_S3N: !Ref ConvertS3N
+      VpcConfig:
+        SecurityGroupIds: !Ref VPCSecurityGroupIds
+        SubnetIds: !Ref VPCSubnetIds
+      Events:
+        ApiGateway:
+          Type: HttpApi
+          Properties:
+            Path: /
+            Method: any
+            ApiId: !Ref HttpApiWithDefaultIamAuth
+  HttpApiWithDefaultIamAuth:
+    Type: AWS::Serverless::HttpApi
+    Properties:
+      FailOnWarnings: true
+      Auth:
+        EnableIamAuthorizer: true
+        DefaultAuthorizer: AWS_IAM
+  InvokerRole:
+    Type: AWS::IAM::Role
+    Properties:
+      Description: IAM Role used by Glue to invoking the Lambda function through API Gateway.
+      Policies:
+        - PolicyName: InvokerPolicy
+          PolicyDocument:
+            Version: 2012-10-17
+            Statement:
+              - Effect: Allow
+                Action: execute-api:Invoke
+                Resource: !Sub arn:aws:execute-api:${AWS::Region}:${AWS::AccountId}:${HttpApiWithDefaultIamAuth}/*
+      AssumeRolePolicyDocument:
+        Version: 2012-10-17
+        Statement:
+          - Effect: Allow
+            Principal:
+              Service:
+                - glue.amazonaws.com
+            Action: sts:AssumeRole
+            Condition:
+              StringEquals:
+                "aws:SourceAccount": !Ref AWS::AccountId
+              ArnLike:
+                "aws:SourceArn": !Sub arn:aws:glue:${AWS::Region}:${AWS::AccountId}:connection/${GlueConnectionName}
+  GlueConnection:
+    Type: AWS::Glue::Connection
+    Properties:
+      CatalogId: !Ref AWS::AccountId
+      ConnectionInput:
+        Name: !Ref GlueConnectionName
+        Description: API Gateway connection to the Lambda function for Hive Metastore.
+        ConnectionType: HIVE_METASTORE
+        ConnectionProperties:
+          ENDPOINT: !Sub https://${HttpApiWithDefaultIamAuth}.execute-api.${AWS::Region}.amazonaws.com
+          ENDPOINT_TYPE: API_GATEWAY
+          ROLE_ARN: !GetAtt InvokerRole.Arn
+          REGION: !Ref AWS::Region
