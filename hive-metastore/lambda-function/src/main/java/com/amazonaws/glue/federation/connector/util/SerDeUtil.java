@@ -16,6 +16,7 @@
 
 package com.amazonaws.glue.federation.connector.util;
 
+import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.PropertyNamingStrategy;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
@@ -30,9 +31,19 @@ public class SerDeUtil {
     private static final ObjectMapper objectMapper;
 
     static {
-        // Settings for serializing/deserializing
-        objectMapper = new ObjectMapper().setPropertyNamingStrategy(PropertyNamingStrategy.UPPER_CAMEL_CASE);
+        /*
+         * Settings for serializing/deserializing
+         */
+        objectMapper = new ObjectMapper();
+
+        // Naming strategy
+        objectMapper.setPropertyNamingStrategy(PropertyNamingStrategy.UPPER_CAMEL_CASE);
+
+        // Modules
         objectMapper.registerModule(new JavaTimeModule());
+
+        // Feature Configurations
+        objectMapper.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
     }
 
     public static <T> T deserialize(String json, Class<T> clazz) {

@@ -13,7 +13,6 @@
 
 package software.amazon.awssdk.services.gluecatalogfederation.model;
 
-import java.beans.Transient;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
@@ -80,8 +79,8 @@ public final class GetTableRequest extends GlueCatalogFederationRequest implemen
     private static final SdkField<Map<String, String>> REQUEST_CONTEXT_FIELD = SdkField
             .<Map<String, String>> builder(MarshallingType.MAP)
             .memberName("RequestContext")
-            .getter(getter(GetTableRequest::requestContextAsStrings))
-            .setter(setter(Builder::requestContextWithStrings))
+            .getter(getter(GetTableRequest::requestContext))
+            .setter(setter(Builder::requestContext))
             .traits(LocationTrait.builder().location(MarshallLocation.PAYLOAD).locationName("RequestContext").build(),
                     MapTrait.builder()
                             .keyLocationName("key")
@@ -179,27 +178,11 @@ public final class GetTableRequest extends GlueCatalogFederationRequest implemen
 
     /**
      * Returns the value of the TableName property for this object.
-     * 
+     *
      * @return The value of the TableName property for this object.
      */
     public final String tableName() {
         return tableName;
-    }
-
-    /**
-     * Returns the value of the RequestContext property for this object.
-     * <p>
-     * Attempts to modify the collection returned by this method will result in an UnsupportedOperationException.
-     * </p>
-     * <p>
-     * This method will never return null. If you would like to know whether the service returned this field (so that
-     * you can differentiate between null and empty), you can use the {@link #hasRequestContext} method.
-     * </p>
-     * 
-     * @return The value of the RequestContext property for this object.
-     */
-    public final Map<RequestContextKey, String> requestContext() {
-        return RequestContextMapCopier.copyStringToEnum(requestContext);
     }
 
     /**
@@ -223,10 +206,10 @@ public final class GetTableRequest extends GlueCatalogFederationRequest implemen
      * This method will never return null. If you would like to know whether the service returned this field (so that
      * you can differentiate between null and empty), you can use the {@link #hasRequestContext} method.
      * </p>
-     * 
+     *
      * @return The value of the RequestContext property for this object.
      */
-    public final Map<String, String> requestContextAsStrings() {
+    public final Map<String, String> requestContext() {
         return requestContext;
     }
 
@@ -254,7 +237,7 @@ public final class GetTableRequest extends GlueCatalogFederationRequest implemen
         hashCode = 31 * hashCode + Objects.hashCode(tableIdentifier());
         hashCode = 31 * hashCode + Objects.hashCode(databaseName());
         hashCode = 31 * hashCode + Objects.hashCode(tableName());
-        hashCode = 31 * hashCode + Objects.hashCode(hasRequestContext() ? requestContextAsStrings() : null);
+        hashCode = 31 * hashCode + Objects.hashCode(hasRequestContext() ? requestContext() : null);
         return hashCode;
     }
 
@@ -281,8 +264,7 @@ public final class GetTableRequest extends GlueCatalogFederationRequest implemen
                 && Objects.equals(databaseIdentifier(), other.databaseIdentifier())
                 && Objects.equals(tableIdentifier(), other.tableIdentifier())
                 && Objects.equals(databaseName(), other.databaseName()) && Objects.equals(tableName(), other.tableName())
-                && hasRequestContext() == other.hasRequestContext()
-                && Objects.equals(requestContextAsStrings(), other.requestContextAsStrings());
+                && hasRequestContext() == other.hasRequestContext() && Objects.equals(requestContext(), other.requestContext());
     }
 
     /**
@@ -295,29 +277,29 @@ public final class GetTableRequest extends GlueCatalogFederationRequest implemen
                 .add("ResourceCatalogArn", resourceCatalogArn()).add("CallerIdentity", callerIdentity())
                 .add("DatabaseIdentifier", databaseIdentifier()).add("TableIdentifier", tableIdentifier())
                 .add("DatabaseName", databaseName()).add("TableName", tableName())
-                .add("RequestContext", hasRequestContext() ? requestContextAsStrings() : null).build();
+                .add("RequestContext", hasRequestContext() ? requestContext() : null).build();
     }
 
     public final <T> Optional<T> getValueForField(String fieldName, Class<T> clazz) {
         switch (fieldName) {
-        case "AsOfAccountId":
-            return Optional.ofNullable(clazz.cast(asOfAccountId()));
-        case "ResourceCatalogArn":
-            return Optional.ofNullable(clazz.cast(resourceCatalogArn()));
-        case "CallerIdentity":
-            return Optional.ofNullable(clazz.cast(callerIdentity()));
-        case "DatabaseIdentifier":
-            return Optional.ofNullable(clazz.cast(databaseIdentifier()));
-        case "TableIdentifier":
-            return Optional.ofNullable(clazz.cast(tableIdentifier()));
-        case "DatabaseName":
-            return Optional.ofNullable(clazz.cast(databaseName()));
-        case "TableName":
-            return Optional.ofNullable(clazz.cast(tableName()));
-        case "RequestContext":
-            return Optional.ofNullable(clazz.cast(requestContextAsStrings()));
-        default:
-            return Optional.empty();
+            case "AsOfAccountId":
+                return Optional.ofNullable(clazz.cast(asOfAccountId()));
+            case "ResourceCatalogArn":
+                return Optional.ofNullable(clazz.cast(resourceCatalogArn()));
+            case "CallerIdentity":
+                return Optional.ofNullable(clazz.cast(callerIdentity()));
+            case "DatabaseIdentifier":
+                return Optional.ofNullable(clazz.cast(databaseIdentifier()));
+            case "TableIdentifier":
+                return Optional.ofNullable(clazz.cast(tableIdentifier()));
+            case "DatabaseName":
+                return Optional.ofNullable(clazz.cast(databaseName()));
+            case "TableName":
+                return Optional.ofNullable(clazz.cast(tableName()));
+            case "RequestContext":
+                return Optional.ofNullable(clazz.cast(requestContext()));
+            default:
+                return Optional.empty();
         }
     }
 
@@ -365,12 +347,13 @@ public final class GetTableRequest extends GlueCatalogFederationRequest implemen
         /**
          * Sets the value of the CallerIdentity property for this object.
          *
-         * This is a convenience that creates an instance of the {@link CallerIdentity.Builder} avoiding the need to
-         * create one manually via {@link CallerIdentity#builder()}.
+         * This is a convenience method that creates an instance of the {@link CallerIdentity.Builder} avoiding the need
+         * to create one manually via {@link CallerIdentity#builder()}.
          *
+         * <p>
          * When the {@link Consumer} completes, {@link CallerIdentity.Builder#build()} is called immediately and its
          * result is passed to {@link #callerIdentity(CallerIdentity)}.
-         * 
+         *
          * @param callerIdentity
          *        a consumer that will call methods on {@link CallerIdentity.Builder}
          * @return Returns a reference to this object so that method calls can be chained together.
@@ -423,16 +406,7 @@ public final class GetTableRequest extends GlueCatalogFederationRequest implemen
          *        The new value for the RequestContext property for this object.
          * @return Returns a reference to this object so that method calls can be chained together.
          */
-        Builder requestContextWithStrings(Map<String, String> requestContext);
-
-        /**
-         * Sets the value of the RequestContext property for this object.
-         *
-         * @param requestContext
-         *        The new value for the RequestContext property for this object.
-         * @return Returns a reference to this object so that method calls can be chained together.
-         */
-        Builder requestContext(Map<RequestContextKey, String> requestContext);
+        Builder requestContext(Map<String, String> requestContext);
 
         @Override
         Builder overrideConfiguration(AwsRequestOverrideConfiguration overrideConfiguration);
@@ -470,7 +444,7 @@ public final class GetTableRequest extends GlueCatalogFederationRequest implemen
             tableIdentifier(model.tableIdentifier);
             databaseName(model.databaseName);
             tableName(model.tableName);
-            requestContextWithStrings(model.requestContext);
+            requestContext(model.requestContext);
         }
 
         public final String getAsOfAccountId() {
@@ -482,7 +456,6 @@ public final class GetTableRequest extends GlueCatalogFederationRequest implemen
         }
 
         @Override
-        @Transient
         public final Builder asOfAccountId(String asOfAccountId) {
             this.asOfAccountId = asOfAccountId;
             return this;
@@ -497,7 +470,6 @@ public final class GetTableRequest extends GlueCatalogFederationRequest implemen
         }
 
         @Override
-        @Transient
         public final Builder resourceCatalogArn(String resourceCatalogArn) {
             this.resourceCatalogArn = resourceCatalogArn;
             return this;
@@ -512,7 +484,6 @@ public final class GetTableRequest extends GlueCatalogFederationRequest implemen
         }
 
         @Override
-        @Transient
         public final Builder callerIdentity(CallerIdentity callerIdentity) {
             this.callerIdentity = callerIdentity;
             return this;
@@ -527,7 +498,6 @@ public final class GetTableRequest extends GlueCatalogFederationRequest implemen
         }
 
         @Override
-        @Transient
         public final Builder databaseIdentifier(String databaseIdentifier) {
             this.databaseIdentifier = databaseIdentifier;
             return this;
@@ -542,7 +512,6 @@ public final class GetTableRequest extends GlueCatalogFederationRequest implemen
         }
 
         @Override
-        @Transient
         public final Builder tableIdentifier(String tableIdentifier) {
             this.tableIdentifier = tableIdentifier;
             return this;
@@ -557,7 +526,6 @@ public final class GetTableRequest extends GlueCatalogFederationRequest implemen
         }
 
         @Override
-        @Transient
         public final Builder databaseName(String databaseName) {
             this.databaseName = databaseName;
             return this;
@@ -572,7 +540,6 @@ public final class GetTableRequest extends GlueCatalogFederationRequest implemen
         }
 
         @Override
-        @Transient
         public final Builder tableName(String tableName) {
             this.tableName = tableName;
             return this;
@@ -590,16 +557,8 @@ public final class GetTableRequest extends GlueCatalogFederationRequest implemen
         }
 
         @Override
-        @Transient
-        public final Builder requestContextWithStrings(Map<String, String> requestContext) {
+        public final Builder requestContext(Map<String, String> requestContext) {
             this.requestContext = RequestContextMapCopier.copy(requestContext);
-            return this;
-        }
-
-        @Override
-        @Transient
-        public final Builder requestContext(Map<RequestContextKey, String> requestContext) {
-            this.requestContext = RequestContextMapCopier.copyEnumToString(requestContext);
             return this;
         }
 

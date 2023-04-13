@@ -13,7 +13,6 @@
 
 package software.amazon.awssdk.services.gluecatalogfederation.model;
 
-import java.beans.Transient;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
@@ -101,9 +100,15 @@ public final class SearchTablesRequest extends GlueCatalogFederationRequest impl
             .memberName("MaxResults").getter(getter(SearchTablesRequest::maxResults)).setter(setter(Builder::maxResults))
             .traits(LocationTrait.builder().location(MarshallLocation.PAYLOAD).locationName("MaxResults").build()).build();
 
+    private static final SdkField<CallerIdentity> CALLER_IDENTITY_FIELD = SdkField
+            .<CallerIdentity> builder(MarshallingType.SDK_POJO).memberName("CallerIdentity")
+            .getter(getter(SearchTablesRequest::callerIdentity)).setter(setter(Builder::callerIdentity))
+            .constructor(CallerIdentity::builder)
+            .traits(LocationTrait.builder().location(MarshallLocation.PAYLOAD).locationName("CallerIdentity").build()).build();
+
     private static final List<SdkField<?>> SDK_FIELDS = Collections.unmodifiableList(Arrays.asList(AS_OF_ACCOUNT_ID_FIELD,
             DATABASE_IDENTIFIER_FIELD, DATABASE_NAME_FIELD, FILTERS_FIELD, SEARCH_TEXT_FIELD, SORT_CRITERIA_FIELD,
-            NEXT_TOKEN_FIELD, MAX_RESULTS_FIELD));
+            NEXT_TOKEN_FIELD, MAX_RESULTS_FIELD, CALLER_IDENTITY_FIELD));
 
     private final String asOfAccountId;
 
@@ -121,6 +126,8 @@ public final class SearchTablesRequest extends GlueCatalogFederationRequest impl
 
     private final Integer maxResults;
 
+    private final CallerIdentity callerIdentity;
+
     private SearchTablesRequest(BuilderImpl builder) {
         super(builder);
         this.asOfAccountId = builder.asOfAccountId;
@@ -131,6 +138,7 @@ public final class SearchTablesRequest extends GlueCatalogFederationRequest impl
         this.sortCriteria = builder.sortCriteria;
         this.nextToken = builder.nextToken;
         this.maxResults = builder.maxResults;
+        this.callerIdentity = builder.callerIdentity;
     }
 
     /**
@@ -243,6 +251,15 @@ public final class SearchTablesRequest extends GlueCatalogFederationRequest impl
         return maxResults;
     }
 
+    /**
+     * Returns the value of the CallerIdentity property for this object.
+     *
+     * @return The value of the CallerIdentity property for this object.
+     */
+    public final CallerIdentity callerIdentity() {
+        return callerIdentity;
+    }
+
     @Override
     public Builder toBuilder() {
         return new BuilderImpl(this);
@@ -268,6 +285,7 @@ public final class SearchTablesRequest extends GlueCatalogFederationRequest impl
         hashCode = 31 * hashCode + Objects.hashCode(hasSortCriteria() ? sortCriteria() : null);
         hashCode = 31 * hashCode + Objects.hashCode(nextToken());
         hashCode = 31 * hashCode + Objects.hashCode(maxResults());
+        hashCode = 31 * hashCode + Objects.hashCode(callerIdentity());
         return hashCode;
     }
 
@@ -293,7 +311,8 @@ public final class SearchTablesRequest extends GlueCatalogFederationRequest impl
                 && Objects.equals(databaseName(), other.databaseName()) && hasFilters() == other.hasFilters()
                 && Objects.equals(filters(), other.filters()) && Objects.equals(searchText(), other.searchText())
                 && hasSortCriteria() == other.hasSortCriteria() && Objects.equals(sortCriteria(), other.sortCriteria())
-                && Objects.equals(nextToken(), other.nextToken()) && Objects.equals(maxResults(), other.maxResults());
+                && Objects.equals(nextToken(), other.nextToken()) && Objects.equals(maxResults(), other.maxResults())
+                && Objects.equals(callerIdentity(), other.callerIdentity());
     }
 
     /**
@@ -306,29 +325,31 @@ public final class SearchTablesRequest extends GlueCatalogFederationRequest impl
                 .add("DatabaseIdentifier", databaseIdentifier()).add("DatabaseName", databaseName())
                 .add("Filters", hasFilters() ? filters() : null).add("SearchText", searchText())
                 .add("SortCriteria", hasSortCriteria() ? sortCriteria() : null).add("NextToken", nextToken())
-                .add("MaxResults", maxResults()).build();
+                .add("MaxResults", maxResults()).add("CallerIdentity", callerIdentity()).build();
     }
 
     public final <T> Optional<T> getValueForField(String fieldName, Class<T> clazz) {
         switch (fieldName) {
-        case "AsOfAccountId":
-            return Optional.ofNullable(clazz.cast(asOfAccountId()));
-        case "DatabaseIdentifier":
-            return Optional.ofNullable(clazz.cast(databaseIdentifier()));
-        case "DatabaseName":
-            return Optional.ofNullable(clazz.cast(databaseName()));
-        case "Filters":
-            return Optional.ofNullable(clazz.cast(filters()));
-        case "SearchText":
-            return Optional.ofNullable(clazz.cast(searchText()));
-        case "SortCriteria":
-            return Optional.ofNullable(clazz.cast(sortCriteria()));
-        case "NextToken":
-            return Optional.ofNullable(clazz.cast(nextToken()));
-        case "MaxResults":
-            return Optional.ofNullable(clazz.cast(maxResults()));
-        default:
-            return Optional.empty();
+            case "AsOfAccountId":
+                return Optional.ofNullable(clazz.cast(asOfAccountId()));
+            case "DatabaseIdentifier":
+                return Optional.ofNullable(clazz.cast(databaseIdentifier()));
+            case "DatabaseName":
+                return Optional.ofNullable(clazz.cast(databaseName()));
+            case "Filters":
+                return Optional.ofNullable(clazz.cast(filters()));
+            case "SearchText":
+                return Optional.ofNullable(clazz.cast(searchText()));
+            case "SortCriteria":
+                return Optional.ofNullable(clazz.cast(sortCriteria()));
+            case "NextToken":
+                return Optional.ofNullable(clazz.cast(nextToken()));
+            case "MaxResults":
+                return Optional.ofNullable(clazz.cast(maxResults()));
+            case "CallerIdentity":
+                return Optional.ofNullable(clazz.cast(callerIdentity()));
+            default:
+                return Optional.empty();
         }
     }
 
@@ -394,16 +415,21 @@ public final class SearchTablesRequest extends GlueCatalogFederationRequest impl
         /**
          * Sets the value of the Filters property for this object.
          *
-         * This is a convenience that creates an instance of the {@link List<PropertyPredicate>.Builder} avoiding the
-         * need to create one manually via {@link List<PropertyPredicate>#builder()}.
+         * This is a convenience method that creates an instance of the
+         * {@link software.amazon.awssdk.services.gluecatalogfederation.model.PropertyPredicate.Builder} avoiding the
+         * need to create one manually via
+         * {@link software.amazon.awssdk.services.gluecatalogfederation.model.PropertyPredicate#builder()}.
          *
-         * When the {@link Consumer} completes, {@link List<PropertyPredicate>.Builder#build()} is called immediately
-         * and its result is passed to {@link #filters(List<PropertyPredicate>)}.
-         * 
+         * <p>
+         * When the {@link Consumer} completes,
+         * {@link software.amazon.awssdk.services.gluecatalogfederation.model.PropertyPredicate.Builder#build()} is
+         * called immediately and its result is passed to {@link #filters(List<PropertyPredicate>)}.
+         *
          * @param filters
-         *        a consumer that will call methods on {@link List<PropertyPredicate>.Builder}
+         *        a consumer that will call methods on
+         *        {@link software.amazon.awssdk.services.gluecatalogfederation.model.PropertyPredicate.Builder}
          * @return Returns a reference to this object so that method calls can be chained together.
-         * @see #filters(List<PropertyPredicate>)
+         * @see #filters(java.util.Collection<PropertyPredicate>)
          */
         Builder filters(Consumer<PropertyPredicate.Builder>... filters);
 
@@ -437,16 +463,21 @@ public final class SearchTablesRequest extends GlueCatalogFederationRequest impl
         /**
          * Sets the value of the SortCriteria property for this object.
          *
-         * This is a convenience that creates an instance of the {@link List<SortCriterion>.Builder} avoiding the need
-         * to create one manually via {@link List<SortCriterion>#builder()}.
+         * This is a convenience method that creates an instance of the
+         * {@link software.amazon.awssdk.services.gluecatalogfederation.model.SortCriterion.Builder} avoiding the need
+         * to create one manually via
+         * {@link software.amazon.awssdk.services.gluecatalogfederation.model.SortCriterion#builder()}.
          *
-         * When the {@link Consumer} completes, {@link List<SortCriterion>.Builder#build()} is called immediately and
-         * its result is passed to {@link #sortCriteria(List<SortCriterion>)}.
-         * 
+         * <p>
+         * When the {@link Consumer} completes,
+         * {@link software.amazon.awssdk.services.gluecatalogfederation.model.SortCriterion.Builder#build()} is called
+         * immediately and its result is passed to {@link #sortCriteria(List<SortCriterion>)}.
+         *
          * @param sortCriteria
-         *        a consumer that will call methods on {@link List<SortCriterion>.Builder}
+         *        a consumer that will call methods on
+         *        {@link software.amazon.awssdk.services.gluecatalogfederation.model.SortCriterion.Builder}
          * @return Returns a reference to this object so that method calls can be chained together.
-         * @see #sortCriteria(List<SortCriterion>)
+         * @see #sortCriteria(java.util.Collection<SortCriterion>)
          */
         Builder sortCriteria(Consumer<SortCriterion.Builder>... sortCriteria);
 
@@ -467,6 +498,34 @@ public final class SearchTablesRequest extends GlueCatalogFederationRequest impl
          * @return Returns a reference to this object so that method calls can be chained together.
          */
         Builder maxResults(Integer maxResults);
+
+        /**
+         * Sets the value of the CallerIdentity property for this object.
+         *
+         * @param callerIdentity
+         *        The new value for the CallerIdentity property for this object.
+         * @return Returns a reference to this object so that method calls can be chained together.
+         */
+        Builder callerIdentity(CallerIdentity callerIdentity);
+
+        /**
+         * Sets the value of the CallerIdentity property for this object.
+         *
+         * This is a convenience method that creates an instance of the {@link CallerIdentity.Builder} avoiding the need
+         * to create one manually via {@link CallerIdentity#builder()}.
+         *
+         * <p>
+         * When the {@link Consumer} completes, {@link CallerIdentity.Builder#build()} is called immediately and its
+         * result is passed to {@link #callerIdentity(CallerIdentity)}.
+         *
+         * @param callerIdentity
+         *        a consumer that will call methods on {@link CallerIdentity.Builder}
+         * @return Returns a reference to this object so that method calls can be chained together.
+         * @see #callerIdentity(CallerIdentity)
+         */
+        default Builder callerIdentity(Consumer<CallerIdentity.Builder> callerIdentity) {
+            return callerIdentity(CallerIdentity.builder().applyMutation(callerIdentity).build());
+        }
 
         @Override
         Builder overrideConfiguration(AwsRequestOverrideConfiguration overrideConfiguration);
@@ -492,6 +551,8 @@ public final class SearchTablesRequest extends GlueCatalogFederationRequest impl
 
         private Integer maxResults;
 
+        private CallerIdentity callerIdentity;
+
         private BuilderImpl() {
         }
 
@@ -505,6 +566,7 @@ public final class SearchTablesRequest extends GlueCatalogFederationRequest impl
             sortCriteria(model.sortCriteria);
             nextToken(model.nextToken);
             maxResults(model.maxResults);
+            callerIdentity(model.callerIdentity);
         }
 
         public final String getAsOfAccountId() {
@@ -516,7 +578,6 @@ public final class SearchTablesRequest extends GlueCatalogFederationRequest impl
         }
 
         @Override
-        @Transient
         public final Builder asOfAccountId(String asOfAccountId) {
             this.asOfAccountId = asOfAccountId;
             return this;
@@ -531,7 +592,6 @@ public final class SearchTablesRequest extends GlueCatalogFederationRequest impl
         }
 
         @Override
-        @Transient
         public final Builder databaseIdentifier(String databaseIdentifier) {
             this.databaseIdentifier = databaseIdentifier;
             return this;
@@ -546,7 +606,6 @@ public final class SearchTablesRequest extends GlueCatalogFederationRequest impl
         }
 
         @Override
-        @Transient
         public final Builder databaseName(String databaseName) {
             this.databaseName = databaseName;
             return this;
@@ -565,14 +624,12 @@ public final class SearchTablesRequest extends GlueCatalogFederationRequest impl
         }
 
         @Override
-        @Transient
         public final Builder filters(Collection<PropertyPredicate> filters) {
             this.filters = SearchPropertyPredicatesCopier.copy(filters);
             return this;
         }
 
         @Override
-        @Transient
         @SafeVarargs
         public final Builder filters(PropertyPredicate... filters) {
             filters(Arrays.asList(filters));
@@ -580,7 +637,6 @@ public final class SearchTablesRequest extends GlueCatalogFederationRequest impl
         }
 
         @Override
-        @Transient
         @SafeVarargs
         public final Builder filters(Consumer<PropertyPredicate.Builder>... filters) {
             filters(Stream.of(filters).map(c -> PropertyPredicate.builder().applyMutation(c).build())
@@ -597,7 +653,6 @@ public final class SearchTablesRequest extends GlueCatalogFederationRequest impl
         }
 
         @Override
-        @Transient
         public final Builder searchText(String searchText) {
             this.searchText = searchText;
             return this;
@@ -616,14 +671,12 @@ public final class SearchTablesRequest extends GlueCatalogFederationRequest impl
         }
 
         @Override
-        @Transient
         public final Builder sortCriteria(Collection<SortCriterion> sortCriteria) {
             this.sortCriteria = SortCriteriaCopier.copy(sortCriteria);
             return this;
         }
 
         @Override
-        @Transient
         @SafeVarargs
         public final Builder sortCriteria(SortCriterion... sortCriteria) {
             sortCriteria(Arrays.asList(sortCriteria));
@@ -631,7 +684,6 @@ public final class SearchTablesRequest extends GlueCatalogFederationRequest impl
         }
 
         @Override
-        @Transient
         @SafeVarargs
         public final Builder sortCriteria(Consumer<SortCriterion.Builder>... sortCriteria) {
             sortCriteria(Stream.of(sortCriteria).map(c -> SortCriterion.builder().applyMutation(c).build())
@@ -648,7 +700,6 @@ public final class SearchTablesRequest extends GlueCatalogFederationRequest impl
         }
 
         @Override
-        @Transient
         public final Builder nextToken(String nextToken) {
             this.nextToken = nextToken;
             return this;
@@ -663,9 +714,22 @@ public final class SearchTablesRequest extends GlueCatalogFederationRequest impl
         }
 
         @Override
-        @Transient
         public final Builder maxResults(Integer maxResults) {
             this.maxResults = maxResults;
+            return this;
+        }
+
+        public final CallerIdentity.Builder getCallerIdentity() {
+            return callerIdentity != null ? callerIdentity.toBuilder() : null;
+        }
+
+        public final void setCallerIdentity(CallerIdentity.BuilderImpl callerIdentity) {
+            this.callerIdentity = callerIdentity != null ? callerIdentity.build() : null;
+        }
+
+        @Override
+        public final Builder callerIdentity(CallerIdentity callerIdentity) {
+            this.callerIdentity = callerIdentity;
             return this;
         }
 

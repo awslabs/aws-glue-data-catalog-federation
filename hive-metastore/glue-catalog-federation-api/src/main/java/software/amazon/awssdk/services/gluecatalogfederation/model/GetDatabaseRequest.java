@@ -13,7 +13,6 @@
 
 package software.amazon.awssdk.services.gluecatalogfederation.model;
 
-import java.beans.Transient;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
@@ -56,11 +55,17 @@ public final class GetDatabaseRequest extends GlueCatalogFederationRequest imple
             .memberName("DatabaseName").getter(getter(GetDatabaseRequest::databaseName)).setter(setter(Builder::databaseName))
             .traits(LocationTrait.builder().location(MarshallLocation.PAYLOAD).locationName("DatabaseName").build()).build();
 
+    private static final SdkField<CallerIdentity> CALLER_IDENTITY_FIELD = SdkField
+            .<CallerIdentity> builder(MarshallingType.SDK_POJO).memberName("CallerIdentity")
+            .getter(getter(GetDatabaseRequest::callerIdentity)).setter(setter(Builder::callerIdentity))
+            .constructor(CallerIdentity::builder)
+            .traits(LocationTrait.builder().location(MarshallLocation.PAYLOAD).locationName("CallerIdentity").build()).build();
+
     private static final SdkField<Map<String, String>> REQUEST_CONTEXT_FIELD = SdkField
             .<Map<String, String>> builder(MarshallingType.MAP)
             .memberName("RequestContext")
-            .getter(getter(GetDatabaseRequest::requestContextAsStrings))
-            .setter(setter(Builder::requestContextWithStrings))
+            .getter(getter(GetDatabaseRequest::requestContext))
+            .setter(setter(Builder::requestContext))
             .traits(LocationTrait.builder().location(MarshallLocation.PAYLOAD).locationName("RequestContext").build(),
                     MapTrait.builder()
                             .keyLocationName("key")
@@ -71,13 +76,15 @@ public final class GetDatabaseRequest extends GlueCatalogFederationRequest imple
                                                     .locationName("value").build()).build()).build()).build();
 
     private static final List<SdkField<?>> SDK_FIELDS = Collections.unmodifiableList(Arrays.asList(AS_OF_ACCOUNT_ID_FIELD,
-            DATABASE_IDENTIFIER_FIELD, DATABASE_NAME_FIELD, REQUEST_CONTEXT_FIELD));
+            DATABASE_IDENTIFIER_FIELD, DATABASE_NAME_FIELD, CALLER_IDENTITY_FIELD, REQUEST_CONTEXT_FIELD));
 
     private final String asOfAccountId;
 
     private final String databaseIdentifier;
 
     private final String databaseName;
+
+    private final CallerIdentity callerIdentity;
 
     private final Map<String, String> requestContext;
 
@@ -86,12 +93,13 @@ public final class GetDatabaseRequest extends GlueCatalogFederationRequest imple
         this.asOfAccountId = builder.asOfAccountId;
         this.databaseIdentifier = builder.databaseIdentifier;
         this.databaseName = builder.databaseName;
+        this.callerIdentity = builder.callerIdentity;
         this.requestContext = builder.requestContext;
     }
 
     /**
      * Returns the value of the AsOfAccountId property for this object.
-     * 
+     *
      * @return The value of the AsOfAccountId property for this object.
      */
     public final String asOfAccountId() {
@@ -100,7 +108,7 @@ public final class GetDatabaseRequest extends GlueCatalogFederationRequest imple
 
     /**
      * Returns the value of the DatabaseIdentifier property for this object.
-     * 
+     *
      * @return The value of the DatabaseIdentifier property for this object.
      */
     public final String databaseIdentifier() {
@@ -109,7 +117,7 @@ public final class GetDatabaseRequest extends GlueCatalogFederationRequest imple
 
     /**
      * Returns the value of the DatabaseName property for this object.
-     * 
+     *
      * @return The value of the DatabaseName property for this object.
      */
     public final String databaseName() {
@@ -117,19 +125,12 @@ public final class GetDatabaseRequest extends GlueCatalogFederationRequest imple
     }
 
     /**
-     * Returns the value of the RequestContext property for this object.
-     * <p>
-     * Attempts to modify the collection returned by this method will result in an UnsupportedOperationException.
-     * </p>
-     * <p>
-     * This method will never return null. If you would like to know whether the service returned this field (so that
-     * you can differentiate between null and empty), you can use the {@link #hasRequestContext} method.
-     * </p>
-     * 
-     * @return The value of the RequestContext property for this object.
+     * Returns the value of the CallerIdentity property for this object.
+     *
+     * @return The value of the CallerIdentity property for this object.
      */
-    public final Map<RequestContextKey, String> requestContext() {
-        return RequestContextMapCopier.copyStringToEnum(requestContext);
+    public final CallerIdentity callerIdentity() {
+        return callerIdentity;
     }
 
     /**
@@ -153,10 +154,10 @@ public final class GetDatabaseRequest extends GlueCatalogFederationRequest imple
      * This method will never return null. If you would like to know whether the service returned this field (so that
      * you can differentiate between null and empty), you can use the {@link #hasRequestContext} method.
      * </p>
-     * 
+     *
      * @return The value of the RequestContext property for this object.
      */
-    public final Map<String, String> requestContextAsStrings() {
+    public final Map<String, String> requestContext() {
         return requestContext;
     }
 
@@ -180,7 +181,8 @@ public final class GetDatabaseRequest extends GlueCatalogFederationRequest imple
         hashCode = 31 * hashCode + Objects.hashCode(asOfAccountId());
         hashCode = 31 * hashCode + Objects.hashCode(databaseIdentifier());
         hashCode = 31 * hashCode + Objects.hashCode(databaseName());
-        hashCode = 31 * hashCode + Objects.hashCode(hasRequestContext() ? requestContextAsStrings() : null);
+        hashCode = 31 * hashCode + Objects.hashCode(callerIdentity());
+        hashCode = 31 * hashCode + Objects.hashCode(hasRequestContext() ? requestContext() : null);
         return hashCode;
     }
 
@@ -203,8 +205,9 @@ public final class GetDatabaseRequest extends GlueCatalogFederationRequest imple
         GetDatabaseRequest other = (GetDatabaseRequest) obj;
         return Objects.equals(asOfAccountId(), other.asOfAccountId())
                 && Objects.equals(databaseIdentifier(), other.databaseIdentifier())
-                && Objects.equals(databaseName(), other.databaseName()) && hasRequestContext() == other.hasRequestContext()
-                && Objects.equals(requestContextAsStrings(), other.requestContextAsStrings());
+                && Objects.equals(databaseName(), other.databaseName())
+                && Objects.equals(callerIdentity(), other.callerIdentity()) && hasRequestContext() == other.hasRequestContext()
+                && Objects.equals(requestContext(), other.requestContext());
     }
 
     /**
@@ -215,21 +218,24 @@ public final class GetDatabaseRequest extends GlueCatalogFederationRequest imple
     public final String toString() {
         return ToString.builder("GetDatabaseRequest").add("AsOfAccountId", asOfAccountId())
                 .add("DatabaseIdentifier", databaseIdentifier()).add("DatabaseName", databaseName())
-                .add("RequestContext", hasRequestContext() ? requestContextAsStrings() : null).build();
+                .add("CallerIdentity", callerIdentity()).add("RequestContext", hasRequestContext() ? requestContext() : null)
+                .build();
     }
 
     public final <T> Optional<T> getValueForField(String fieldName, Class<T> clazz) {
         switch (fieldName) {
-        case "AsOfAccountId":
-            return Optional.ofNullable(clazz.cast(asOfAccountId()));
-        case "DatabaseIdentifier":
-            return Optional.ofNullable(clazz.cast(databaseIdentifier()));
-        case "DatabaseName":
-            return Optional.ofNullable(clazz.cast(databaseName()));
-        case "RequestContext":
-            return Optional.ofNullable(clazz.cast(requestContextAsStrings()));
-        default:
-            return Optional.empty();
+            case "AsOfAccountId":
+                return Optional.ofNullable(clazz.cast(asOfAccountId()));
+            case "DatabaseIdentifier":
+                return Optional.ofNullable(clazz.cast(databaseIdentifier()));
+            case "DatabaseName":
+                return Optional.ofNullable(clazz.cast(databaseName()));
+            case "CallerIdentity":
+                return Optional.ofNullable(clazz.cast(callerIdentity()));
+            case "RequestContext":
+                return Optional.ofNullable(clazz.cast(requestContext()));
+            default:
+                return Optional.empty();
         }
     }
 
@@ -275,13 +281,32 @@ public final class GetDatabaseRequest extends GlueCatalogFederationRequest imple
         Builder databaseName(String databaseName);
 
         /**
-         * Sets the value of the RequestContext property for this object.
+         * Sets the value of the CallerIdentity property for this object.
          *
-         * @param requestContext
-         *        The new value for the RequestContext property for this object.
+         * @param callerIdentity
+         *        The new value for the CallerIdentity property for this object.
          * @return Returns a reference to this object so that method calls can be chained together.
          */
-        Builder requestContextWithStrings(Map<String, String> requestContext);
+        Builder callerIdentity(CallerIdentity callerIdentity);
+
+        /**
+         * Sets the value of the CallerIdentity property for this object.
+         *
+         * This is a convenience method that creates an instance of the {@link CallerIdentity.Builder} avoiding the need
+         * to create one manually via {@link CallerIdentity#builder()}.
+         *
+         * <p>
+         * When the {@link Consumer} completes, {@link CallerIdentity.Builder#build()} is called immediately and its
+         * result is passed to {@link #callerIdentity(CallerIdentity)}.
+         *
+         * @param callerIdentity
+         *        a consumer that will call methods on {@link CallerIdentity.Builder}
+         * @return Returns a reference to this object so that method calls can be chained together.
+         * @see #callerIdentity(CallerIdentity)
+         */
+        default Builder callerIdentity(Consumer<CallerIdentity.Builder> callerIdentity) {
+            return callerIdentity(CallerIdentity.builder().applyMutation(callerIdentity).build());
+        }
 
         /**
          * Sets the value of the RequestContext property for this object.
@@ -290,7 +315,7 @@ public final class GetDatabaseRequest extends GlueCatalogFederationRequest imple
          *        The new value for the RequestContext property for this object.
          * @return Returns a reference to this object so that method calls can be chained together.
          */
-        Builder requestContext(Map<RequestContextKey, String> requestContext);
+        Builder requestContext(Map<String, String> requestContext);
 
         @Override
         Builder overrideConfiguration(AwsRequestOverrideConfiguration overrideConfiguration);
@@ -306,6 +331,8 @@ public final class GetDatabaseRequest extends GlueCatalogFederationRequest imple
 
         private String databaseName;
 
+        private CallerIdentity callerIdentity;
+
         private Map<String, String> requestContext = DefaultSdkAutoConstructMap.getInstance();
 
         private BuilderImpl() {
@@ -316,7 +343,8 @@ public final class GetDatabaseRequest extends GlueCatalogFederationRequest imple
             asOfAccountId(model.asOfAccountId);
             databaseIdentifier(model.databaseIdentifier);
             databaseName(model.databaseName);
-            requestContextWithStrings(model.requestContext);
+            callerIdentity(model.callerIdentity);
+            requestContext(model.requestContext);
         }
 
         public final String getAsOfAccountId() {
@@ -328,7 +356,6 @@ public final class GetDatabaseRequest extends GlueCatalogFederationRequest imple
         }
 
         @Override
-        @Transient
         public final Builder asOfAccountId(String asOfAccountId) {
             this.asOfAccountId = asOfAccountId;
             return this;
@@ -343,7 +370,6 @@ public final class GetDatabaseRequest extends GlueCatalogFederationRequest imple
         }
 
         @Override
-        @Transient
         public final Builder databaseIdentifier(String databaseIdentifier) {
             this.databaseIdentifier = databaseIdentifier;
             return this;
@@ -358,9 +384,22 @@ public final class GetDatabaseRequest extends GlueCatalogFederationRequest imple
         }
 
         @Override
-        @Transient
         public final Builder databaseName(String databaseName) {
             this.databaseName = databaseName;
+            return this;
+        }
+
+        public final CallerIdentity.Builder getCallerIdentity() {
+            return callerIdentity != null ? callerIdentity.toBuilder() : null;
+        }
+
+        public final void setCallerIdentity(CallerIdentity.BuilderImpl callerIdentity) {
+            this.callerIdentity = callerIdentity != null ? callerIdentity.build() : null;
+        }
+
+        @Override
+        public final Builder callerIdentity(CallerIdentity callerIdentity) {
+            this.callerIdentity = callerIdentity;
             return this;
         }
 
@@ -376,16 +415,8 @@ public final class GetDatabaseRequest extends GlueCatalogFederationRequest imple
         }
 
         @Override
-        @Transient
-        public final Builder requestContextWithStrings(Map<String, String> requestContext) {
+        public final Builder requestContext(Map<String, String> requestContext) {
             this.requestContext = RequestContextMapCopier.copy(requestContext);
-            return this;
-        }
-
-        @Override
-        @Transient
-        public final Builder requestContext(Map<RequestContextKey, String> requestContext) {
-            this.requestContext = RequestContextMapCopier.copyEnumToString(requestContext);
             return this;
         }
 

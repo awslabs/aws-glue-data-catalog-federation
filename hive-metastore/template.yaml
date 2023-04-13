@@ -10,7 +10,7 @@ Metadata:
     SpdxLicenseId: Apache-2.0
     LicenseUrl: LICENSE.txt
     ReadmeUrl: README.md
-    SemanticVersion: 1.0.0
+    SemanticVersion: 1.0.1
     HomePageUrl: https://aws.amazon.com/glue/
     SourceCodeUrl: https://github.com/awslabs/aws-glue-data-catalog-federation
 
