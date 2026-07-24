@@ -16,6 +16,8 @@
 
 package com.amazonaws.glue.federation.connector.search.util;
 
+import java.util.regex.Pattern;
+
 /**
  * Utility class for adhering to Glue-specific search behavior.
  */
@@ -39,7 +41,12 @@ public class GlueSearchUtil {
         }
 
         // \p{Punct} same as [!"\#$%&'()*+,\-./:;<=>?@\[\\\]^_‘{|}~]
-        String matchPattern = "^(.*\\p{Punct})*" + searchValue + "(\\p{Punct}.*)*$";
-        return itemProperty.matches(matchPattern);
+        // Escape searchValue so regex metacharacters are treated as literals,
+        // then wrap with punctuation-boundary anchors.
+        // Uses (?:.*\p{Punct})? instead of (.*\p{Punct})* — semantically identical
+        // but eliminates the nested quantifier that causes catastrophic backtracking.
+        String escapedSearchValue = Pattern.quote(searchValue);
+        String matchPattern = "^(?:.*\\p{Punct})?" + escapedSearchValue + "(?:\\p{Punct}.*)?$";
+        return Pattern.matches(matchPattern, itemProperty);
     }
 }
